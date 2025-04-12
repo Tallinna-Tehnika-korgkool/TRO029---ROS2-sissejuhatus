@@ -10,3 +10,9 @@
 [submodule "chapters/week13-14_launch"]
 	path = chapters/week13-14_launch
 	url = https://github.com/tktkrobootika/TRO013-week13-14_launch-template.git
+[submodule "chapters/week03-04_linux"]
+	path = chapters/week03-04_linux
+	url = https://github.com/tktkrobootika/TRO013-week03-04_linux-template
+[submodule "chapters/week05-06_architecture"]
+	path = chapters/week05-06_architecture
+	url = https://github.com/tktkrobootika/TRO013-week05-06_architecture-template
