@@ -7,3 +7,6 @@
 [submodule "chapters/week11-12_services"]
 	path = chapters/week11-12_services
 	url = https://github.com/tktkrobootika/TRO013-week11-12_services-template.git
+[submodule "chapters/week13-14_launch"]
+	path = chapters/week13-14_launch
+	url = https://github.com/tktkrobootika/TRO013-week13-14_launch-template.git
