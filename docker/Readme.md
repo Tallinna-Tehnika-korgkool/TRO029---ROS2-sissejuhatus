@@ -1,71 +1,47 @@
-# ROS 2 Docker-konteiner õppekeskkond (TRO029)
+# Docker-keskkond kursusele TRO029 — ROS2 sissejuhatus
 
-See kaust sisaldab Docker-põhist ROS 2 Humble konteineri keskkonda, mida kasutatakse kursusel **TRO029 — Sissejuhatus ROS 2**. See konteiner võimaldab tudengitel käivitada ROS 2 süsteemi oma arvutis kiiresti ja ilma keerulise paigalduseta, kasutades **VS Code'i** ja **GitHub Classroom**i.
+See kaust sisaldab standardset Docker-keskkonda, mida kasutatakse kursusel **TRO029 — ROS2 sissejuhatus**. Keskkond põhineb [ROS 2 Humble](https://docs.ros.org/en/humble/) versioonil ja on mõeldud kasutamiseks koos Visual Studio Code'iga.
 
----
+##  Mis siin kaustas on?
 
-## 🧰 Eeldused
+- `Dockerfile` — määratleb, milline tarkvara ja sõltuvused on konteineris saadaval.
+- `supervisord.conf` — konfigureerib protsesside haldamise konteineri sees.
+- `.devcontainer/` — Visual Studio Code'i konfiguratsioon kausta automaatseks konteineris avamiseks.
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) on paigaldatud
-- Git tööriist on olemas (nt Git Bash, WSL, VS Code Terminal jne)
-- VS Code soovituslik koos [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) laiendusega
+##  Keskkonna käivitamine VS Code'iga
 
----
+1. Veendu, et sul on paigaldatud:
+   - [Docker Desktop](https://www.docker.com/products/docker-desktop)
+   - [Visual Studio Code](https://code.visualstudio.com/)
+   - VS Code'i laiendus: **Dev Containers**  
+     [Installi siit](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-## 🚀 Keskkonna käivitamine VS Code'iga
+2. Ava see projekt VS Code'is:
 
-1. **Klooni oma GitHub Classroomi repo** (see sisaldab `docker/` kausta):
+   ```bash
+   git clone https://github.com/Tallinna-Tehnika-korgkool/TRO029---ROS2-sissejuhatus.git
+   cd TRO029---ROS2-sissejuhatus
+   code .
+   ```
 
-    ```bash
-    git clone https://github.com/[SINU-KASUTAJA]/TRO029-week01-02_intro.git
-    cd TRO029-week01-02_intro/docker
-    ```
+3. VS Code küsib:  
+    **„Reopen in Container”** – vali see!  
+   See käivitab konteineri automaatselt kasutades `.devcontainer` konfiguratsiooni.
 
-2. **Ava kaust VS Code'iga** ja vali:  
-   👉 *"Reopen in Container"* (VS Code pakub seda automaatselt, kui DevContainer on määratud)
+4. Terminalis kontrolli, kas ROS 2 on töötav:
 
-3. **Valmis!** VS Code käivitab konteineri, kus ROS 2 on juba seadistatud.  
-   Terminal peaks näitama, et oled konteineri sees ning saad kasutada näiteks:
+   ```bash
+   ros2 --version
+   ```
 
-    ```bash
-    ros2 --version
-    ```
+Kui näed ROS 2 versiooni, on kõik korras 🎉
 
----
+##  Märkused
 
-## 🛠️ Kuidas see töötab?
-
-- `Dockerfile` ja `supervisord.conf` failid asuvad `docker/` kaustas
-- Konteiner sisaldab ROS 2 Humble, build-tööriistu, supervisord daemonit jne
-- VS Code DevContainer failid toetavad automaatset avamist konteineris
-
----
-
-## 🧪 Automaatne testimine
-
-> Tudengi ülesandekaustas `student/` asub **tühi Dockerfile**, mida tuleb täita.
-
-- Kui `student/Dockerfile` on õigesti täidetud, siis **GitHub Actions** test workflow `.github/workflows/test-dockerfile.yml` kontrollib selle.
-- Test kontrollib, kas:
-  - konteiner ehitub edukalt,
-  - ROS 2 on kasutatav (`ros2 --version`).
-
-Tulemusi saab näha **GitHub repo `Actions` tabilt** pärast `git push`i.
+- See konteiner **ei sisalda ühtegi kursuse spetsiifilist ülesannet** – see on baasõpikeskkond.
+- Tudengi isiklikes ülesannete repodes (nt week01-02) kasutatakse seda keskkonda viitena või koopiana.
 
 ---
 
-## 🧠 Märkused õpetajale
-
-- `docker/` kaust asub **pearepos** (TRO029---ROS2-sissejuhatus) ning on jagatud kõigile nädalatele
-- Tudengi isiklik repo sisaldab `docker/` sümboolset/kopeeritud koopiat või viita
-
----
-
-## 🆘 Abi
-
-Kui konteiner ei tööta:
-
-- Veendu, et Docker Desktop on käivitatud
-- Kontrolli, kas VS Code'il on Dev Containers plugin
-- Ava terminalis `docker ps` või `docker info` ja kontrolli veateateid
+ Probleemide korral kontrolli, kas Docker töötab (`docker info`) ja kas VS Code'il on Dev Containers plugin.
 
