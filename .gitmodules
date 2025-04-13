@@ -16,3 +16,6 @@
 [submodule "chapters/week05-06_architecture"]
 	path = chapters/week05-06_architecture
 	url = https://github.com/tktkrobootika/TRO013-week05-06_architecture-template
+[submodule "chapters/week01-02_intro"]
+	path = chapters/week01-02_intro
+	url = https://github.com/tktkrobootika/TRO013-week01-02_intro-template
