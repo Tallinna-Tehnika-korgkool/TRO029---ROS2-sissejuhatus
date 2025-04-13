@@ -1,5 +1,5 @@
 # Use a more secure and updated base image
-FROM ros:humble-ros
+FROM osrf/ros:humble-ros-core
 
 # Use a vulnerability scanning tool to identify and mitigate issues
 RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
