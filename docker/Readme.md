@@ -1,41 +1,71 @@
-# ROS 2 Docker-konteiner tudengitele
+# ROS 2 Docker-konteiner õppekeskkond (TRO029)
 
-See repo sisaldab Docker-põhist ROS 2 Humble konteinerit, mis on loodud kasutamiseks sissejuhatava ROS 2 kursuse raames. Konteiner võimaldab tudengitel kiiresti alustada tööd ilma keerulise paigaldusprotsessita.
+See kaust sisaldab Docker-põhist ROS 2 Humble konteineri keskkonda, mida kasutatakse kursusel **TRO029 — Sissejuhatus ROS 2**. See konteiner võimaldab tudengitel käivitada ROS 2 süsteemi oma arvutis kiiresti ja ilma keerulise paigalduseta, kasutades **VS Code'i** ja **GitHub Classroom**i.
 
-## Nõuded
+---
 
-- Paigaldatud [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- Git-tugi (näiteks [Git](https://git-scm.com/), või sisseehitatud terminal VS Code'is, PyCharmis või muus koodiredaktoris)
+## 🧰 Eeldused
 
-> Git käske saab kasutada erinevates terminalides: VS Code'i Terminal, Git Bash, PyCharma sisseehitatud terminal, WSL jne.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) on paigaldatud
+- Git tööriist on olemas (nt Git Bash, WSL, VS Code Terminal jne)
+- VS Code soovituslik koos [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) laiendusega
 
-## Repo kloonimine ja Docker-image ehitamine
+---
 
-1. Ava terminal (nt. VS Code Terminal või Git Bash) ja klooni see repo:
+## 🚀 Keskkonna käivitamine VS Code'iga
 
-    ```bash
-    git clone https://github.com/Tallinna-tehnikakorgkool/TRO013.git
-    cd TRO013
-    ```
-
-2. Ehita Docker-pilt:
+1. **Klooni oma GitHub Classroomi repo** (see sisaldab `docker/` kausta):
 
     ```bash
-    docker build -t ros2-student-image .
+    git clone https://github.com/[SINU-KASUTAJA]/TRO029-week01-02_intro.git
+    cd TRO029-week01-02_intro/docker
     ```
 
-3. Käivita konteiner:
+2. **Ava kaust VS Code'iga** ja vali:  
+   👉 *"Reopen in Container"* (VS Code pakub seda automaatselt, kui DevContainer on määratud)
+
+3. **Valmis!** VS Code käivitab konteineri, kus ROS 2 on juba seadistatud.  
+   Terminal peaks näitama, et oled konteineri sees ning saad kasutada näiteks:
 
     ```bash
-    docker run -it --rm --net=host --privileged ros2-student-image
+    ros2 --version
     ```
 
->  `--net=host` ja `--privileged` tagavad parema võrguühenduse ja seadmete toe ROS 2 jaoks.
+---
 
-## (Valikuline) Image-i allalaadimine Docker Hubist
+## 🛠️ Kuidas see töötab?
 
-Kui õpetaja on image juba Docker Hubi üles laadinud, saab selle tõmmata ja käivitada ilma ise ehitamata:
+- `Dockerfile` ja `supervisord.conf` failid asuvad `docker/` kaustas
+- Konteiner sisaldab ROS 2 Humble, build-tööriistu, supervisord daemonit jne
+- VS Code DevContainer failid toetavad automaatset avamist konteineris
 
-```bash
-docker pull kasutajanimi/ros2-student-image:humble
-docker run -it --rm --net=host --privileged kasutajanimi/ros2-student-image:humble
+---
+
+## 🧪 Automaatne testimine
+
+> Tudengi ülesandekaustas `student/` asub **tühi Dockerfile**, mida tuleb täita.
+
+- Kui `student/Dockerfile` on õigesti täidetud, siis **GitHub Actions** test workflow `.github/workflows/test-dockerfile.yml` kontrollib selle.
+- Test kontrollib, kas:
+  - konteiner ehitub edukalt,
+  - ROS 2 on kasutatav (`ros2 --version`).
+
+Tulemusi saab näha **GitHub repo `Actions` tabilt** pärast `git push`i.
+
+---
+
+## 🧠 Märkused õpetajale
+
+- `docker/` kaust asub **pearepos** (TRO029---ROS2-sissejuhatus) ning on jagatud kõigile nädalatele
+- Tudengi isiklik repo sisaldab `docker/` sümboolset/kopeeritud koopiat või viita
+
+---
+
+## 🆘 Abi
+
+Kui konteiner ei tööta:
+
+- Veendu, et Docker Desktop on käivitatud
+- Kontrolli, kas VS Code'il on Dev Containers plugin
+- Ava terminalis `docker ps` või `docker info` ja kontrolli veateateid
+

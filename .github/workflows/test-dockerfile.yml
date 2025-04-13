@@ -1,0 +1,22 @@
+name: Test Student Dockerfile
+
+on:
+  push:
+    paths:
+      - 'chapters/week01-02_intro/student/Dockerfile'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t student-ros2 -f chapters/week01-02_intro/student/Dockerfile .
+
+      - name: Run container and check ROS 2 version
+        run: |
+          docker run --rm student-ros2 bash -c "source /opt/ros/humble/setup.bash && ros2 --version"
