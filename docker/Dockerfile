@@ -1,4 +1,16 @@
-FROM ros:humble-ros-base
+FROM ros:humble-ros-base AS base
+
+# Use a vulnerability scanning tool to identify and mitigate issues
+RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    debsums \
+    apt-transport-https && \
+    debsums -c && \
+    rm -rf /var/lib/apt/lists/*
+
+# Update all packages to their latest versions to mitigate vulnerabilities
+RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install necessary ROS2 packages and system utilities
 RUN apt-get update && apt-get install -y \
