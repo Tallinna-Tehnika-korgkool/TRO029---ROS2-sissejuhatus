@@ -1,21 +1,21 @@
 [submodule "chapters/week07-08_workspace"]
 	path = chapters/week07-08_workspace
-	url = https://github.com/tktkrobootika/TRO013-week07-08_workspace-template
+	url = https://github.com/tktkrobootika/TRO029-week07-08_workspace-template
 [submodule "chapters/week09-10_pubsub"]
 	path = chapters/week09-10_pubsub
-	url = https://github.com/tktkrobootika/TRO013-week09-10_pubsub-template.git
+	url = https://github.com/tktkrobootika/TRO029-week09-10_pubsub-template.git
 [submodule "chapters/week11-12_services"]
 	path = chapters/week11-12_services
-	url = https://github.com/tktkrobootika/TRO013-week11-12_services-template.git
+	url = https://github.com/tktkrobootika/TRO029-week11-12_services-template.git
 [submodule "chapters/week13-14_launch"]
 	path = chapters/week13-14_launch
-	url = https://github.com/tktkrobootika/TRO013-week13-14_launch-template.git
+	url = https://github.com/tktkrobootika/TRO029-week13-14_launch-template.git
 [submodule "chapters/week03-04_linux"]
 	path = chapters/week03-04_linux
-	url = https://github.com/tktkrobootika/TRO013-week03-04_linux-template
+	url = https://github.com/tktkrobootika/TRO029-week03-04_linux-template
 [submodule "chapters/week05-06_architecture"]
 	path = chapters/week05-06_architecture
-	url = https://github.com/tktkrobootika/TRO013-week05-06_architecture-template
+	url = https://github.com/tktkrobootika/TRO029-week05-06_architecture-template
 [submodule "chapters/week01-02_intro"]
 	path = chapters/week01-02_intro
-	url = https://github.com/tktkrobootika/TRO013-week01-02_intro-template
+	url = https://github.com/tktkrobootika/TRO029-week01-02_intro-template
