@@ -1,7 +1,7 @@
-# Use a more secure and updated base image
+# ROS 2 Humble base image
 FROM ros:humble
 
-# Use a vulnerability scanning tool to identify and mitigate issues
+# Süsteemi uuendus ja turvakontroll
 RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
     apt-get install -y --no-install-recommends \
     debsums \
@@ -9,11 +9,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
     debsums -c && \
     rm -rf /var/lib/apt/lists/*
 
-# Update all packages to their latest versions to mitigate vulnerabilities
-RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install necessary ROS2 packages and system utilities
+# Vajalikud ROS 2 paketid ja tööriistad
 RUN apt-get update && apt-get install -y \
     ros-humble-rviz2 \
     ros-humble-rqt \
@@ -36,65 +32,62 @@ RUN apt-get update && apt-get install -y \
     tightvncserver && \
     rm -rf /var/lib/apt/lists/*
 
-# Ensure SSH runs properly
+# SSH jaoks vajalik kaust
 RUN mkdir -p /var/run/sshd
 
-# Enable SSH Root Login
+# SSH Root login lubamine
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Install Python dependencies
+# Python-põhised tööriistad
 RUN pip3 install --no-cache-dir \
     numpy \
     matplotlib \
     jupyter \
     notebook
 
-# Setup workspace
+# Töökeskkonna seadistus
 WORKDIR /workspace
 RUN mkdir -p ros2_ws/src
 
-# Setup ROS environment
-RUN echo "source /opt/ros/humble/setup.bash" >> /etc/bash.bashrc
-RUN echo "source /workspace/ros2_ws/install/setup.bash 2>/dev/null || true" >> /etc/bash.bashrc
+# ROS 2 keskkonna allikate lisamine
+RUN echo "source /opt/ros/humble/setup.bash" >> /etc/bash.bashrc && \
+    echo "source /workspace/ros2_ws/install/setup.bash 2>/dev/null || true" >> /etc/bash.bashrc
 
-# Create a student user (runtime configurable)
+# Tudengi kasutaja loomine
 ARG USERNAME=student
 ENV USERNAME=$USERNAME
 RUN useradd -m "$USERNAME" && \
     echo "$USERNAME:$USERNAME" | chpasswd && \
     usermod -aG sudo "$USERNAME"
 
-# Set VNC Password dynamically based on USERNAME
+# VNC parooli seadistus
 RUN mkdir -p /root/.vnc && \
     echo -n "$USERNAME" | vncpasswd -f > /root/.vnc/passwd && \
     chmod 600 /root/.vnc/passwd
 
-# Copy supervisord configuration **before modifying it**
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Supervisord konfiguratsioonifail
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Modify supervisord.conf to use the VNC password
-RUN sed -i 's/x11vnc -display :1 -forever -shared -nopw/x11vnc -display :0 -forever -shared -rfbauth \/root\/.vnc\/passwd/' /etc/supervisor/conf.d/supervisord.conf
+# Jupyter parool ja seadistused
+RUN mkdir -p /root/.jupyter && \
+    echo "c.NotebookApp.token = '$USERNAME'" > /root/.jupyter/jupyter_notebook_config.py
 
-# Set Jupyter Token dynamically
-RUN mkdir -p /root/.jupyter
-RUN echo "c.NotebookApp.token = '$USERNAME'" > /root/.jupyter/jupyter_notebook_config.py
-
-# Setup noVNC
+# noVNC seadistamine
 RUN git clone https://github.com/novnc/noVNC.git /opt/novnc && \
     git clone https://github.com/novnc/websockify.git /opt/novnc/utils/websockify && \
     chmod +x /opt/novnc/utils/novnc_proxy
 
-# Configure X11, VNC, and Fluxbox for GUI access
+# X11 + VNC GUI seadistamine
 RUN mkdir -p /root/.vnc && \
     echo '#!/bin/sh' > /root/.vnc/xstartup && \
     echo 'fluxbox &' >> /root/.vnc/xstartup && \
     chmod +x /root/.vnc/xstartup
 
-# Copy supervisord configuration (again for Docker caching reasons)
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Kaust logide jaoks
+RUN mkdir -p /var/log/supervisor
 
-# Expose required ports
+# Vajalikud pordid
 EXPOSE 22 80 8888 11311 5900 6080
 
-# Start Supervisor to manage services (SSH, Jupyter, VNC, noVNC)
+# Käivitamine
 CMD ["/usr/bin/supervisord"]
