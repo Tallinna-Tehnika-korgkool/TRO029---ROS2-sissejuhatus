@@ -1,0 +1,38 @@
+name: Kontrolli Linuxi harjutuse esitamist
+
+on: [push, pull_request]
+
+jobs:
+  kontroll:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Kontrolli failide olemasolu
+      run: |
+        test -f harjutus/minu_fail.txt || (echo "❌ Puudub: harjutus/minu_fail.txt" && exit 1)
+        test -f harjutus/võrgu_logid.txt || (echo "❌ Puudub: harjutus/võrgu_logid.txt" && exit 1)
+        test -f harjutus/kasutatud_käsud.txt || (echo "❌ Puudub: harjutus/kasutatud_käsud.txt" && exit 1)
+
+    - name: Kontrolli faili sisu
+      run: |
+        grep -Fxq "See on testfail Linuxi harjutuse jaoks." harjutus/minu_fail.txt || (echo "❌ Tekst ei sobi failis: minu_fail.txt" && exit 1)
+
+    - name: Kontrolli faili õigusi
+      run: |
+        perms=$(stat -c "%a" harjutus/minu_fail.txt)
+        if [ "$perms" != "600" ]; then
+          echo "❌ Faili õigused on $perms, aga oodati 600"
+          exit 1
+        fi
+
+    - name: Kontrolli, et võrgu_logid.txt pole tühi
+      run: |
+        if [ ! -s harjutus/võrgu_logid.txt ]; then
+          echo "❌ Fail harjutus/võrgu_logid.txt on tühi"
+          exit 1
+        fi
+
+    - name: Kontroll edukalt läbitud 🎉
+      run: echo "✅ Kõik vajalikud failid olemas ja kontrollitud!"
