@@ -19,3 +19,4 @@
 [submodule "chapters/week01-02_intro"]
 	path = chapters/week01-02_intro
 	url = https://github.com/Tallinna-Tehnika-korgkool/TRO029-week01-02_intro-template.git
+	branch = main
