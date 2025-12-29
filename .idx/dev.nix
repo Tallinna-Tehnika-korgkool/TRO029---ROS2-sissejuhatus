@@ -7,6 +7,8 @@
   packages = [
     pkgs.git
     pkgs.docker-compose
+    pkgs.openssh
+
   ];
 
   services.docker.enable = true;

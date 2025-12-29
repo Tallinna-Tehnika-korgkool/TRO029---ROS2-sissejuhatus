@@ -28,6 +28,82 @@ Iga teema on jagatud kahe nädalaseks plokiks ja hallatud eraldi Git submodule'i
 
 # TRO029 ROS2 Kursus - Tudengi Juhend
 
+## 🧪 Arenduskeskkond: Firebase Studio (IDX)
+
+Selles kursuses kasutame **Firebase Studio (IDX)** pilvepõhist arenduskeskkonda.
+
+IDX võimaldab:
+- töötada **otse veebibrauseris** (VS Code’i sarnane keskkond),
+- kasutada **Dockerit ilma lokaalset paigaldust tegemata**,
+- käivitada **valmis ROS 2 Humble keskkonda**,
+- vältida operatsioonisüsteemi- ja paigaldusprobleeme.
+
+👉 **Soovituslik ja eelistatud viis kursuse läbimiseks on IDX kasutamine.**
+
+Saad seda repositooriumit kasutada ka Docker desktop tarkvara kasutades. Selleks vaata Chapters/week01-02/Readme.md
+
+---
+
+## 🔑 Konto nõue (VÄGA OLULINE)
+
+IDX ja GitHub **peavad olema seotud sinu koolikontoga**.
+
+⚠️ **Kasuta alati oma `@tktk.ee` e-posti aadressi**, mis:
+- on sinu ametlik koolikonto,
+- on sama konto, millega oled GitHubis,
+- on seotud kursuse ja GitHub Classroomi õigustega.
+
+Kui sul on GitHubis mitu kontot, veendu, et:
+- IDX-s oled sisse logitud **@tktk.ee kontoga**,
+- see konto omab ligipääsu sellele repositoryle.
+
+---
+
+## 🚀 Kursuse avamine Firebase Studios (IDX)
+
+### Esmakordne avamine
+
+1. Ava Firebase Studio (IDX):  
+   👉 https://idx.google.com
+
+2. Logi sisse **oma `@tktk.ee` kontoga**
+
+3. Vali **“Import repository”** / **“Open repository”**
+
+4. Sisesta kursuse GitHub repo aadress:
+   ```text
+   https://github.com/Tallinna-Tehnika-korgkool/TRO029---ROS2-sissejuhatus.git
+Oota, kuni workspace käivitub
+
+⏳ Esimene käivitamine võib võtta mitu minutit, kuna:
+
+ehitatakse Docker image,
+
+paigaldatakse ROS 2 ja vajalikud tööriistad.
+
+🐳 Mis toimub taustal?
+Kui IDX workspace käivitub:
+
+kasutatakse faili .idx/dev.nix,
+
+lubatakse Docker teenus,
+
+ehitatakse ROS 2 Humble Docker image (tro029-ros2),
+
+käivitatakse konteiner automaatselt,
+
+kogu ROS 2 töö toimub Docker-konteineri sees.
+
+👉 Tudengina ei pea:
+
+Dockerit käsitsi seadistama,
+
+ROS 2 installima,
+
+süsteemseid konfiguratsioone muutma.
+
+ei pea olema kooli võrgus
+
 ## 📋 Ülevaade
 
 Sa töötad **kahes keskkonnas**:
