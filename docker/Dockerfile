@@ -1,93 +1,172 @@
-# ROS 2 Humble base image
+# =========================================================
+# ROS 2 Humble – Student Environment (TRO029) (bulletproof)
+# =========================================================
 FROM ros:humble
 
-# Süsteemi uuendus ja turvakontroll
+SHELL ["/bin/bash", "-lc"]
+
+# ---------------------------------------------------------
+# System update + integrity tools
+# ---------------------------------------------------------
 RUN apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
     apt-get install -y --no-install-recommends \
-    debsums \
-    apt-transport-https && \
-    debsums -c && \
+      debsums \
+      apt-transport-https && \
+    debsums -c || true && \
     rm -rf /var/lib/apt/lists/*
 
-# Vajalikud ROS 2 paketid ja tööriistad
-RUN apt-get update && apt-get install -y \
+# ---------------------------------------------------------
+# ROS 2 CLI + tools + GUI + remote access
+# ---------------------------------------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # --- ROS 2 CLI (CRITICAL) ---
+    ros-humble-ros2cli \
+    ros-humble-ros2launch \
+    ros-humble-ros2topic \
+    ros-humble-ros2node \
+    ros-humble-ros2service \
+    ros-humble-ros2param \
+    \
+    # --- ROS visual / demo ---
     ros-humble-rviz2 \
     ros-humble-rqt \
     ros-humble-rqt-common-plugins \
-    python3-pip \
+    ros-humble-demo-nodes-cpp \
+    ros-humble-demo-nodes-py \
+    \
+    # --- Dev tools ---
     python3-colcon-common-extensions \
+    python3-pip \
     git \
     vim \
-    supervisor \
-    xvfb \
-    x11vnc \
-    novnc \
+    sudo \
+    \
+    # --- Networking / diagnostics ---
     iputils-ping \
     net-tools \
     iproute2 \
-    openssh-server \
+    \
+    # --- GUI / VNC / remote ---
+    supervisor \
+    xvfb \
+    x11vnc \
     fluxbox \
     xterm \
-    sudo \
-    tightvncserver && \
-    rm -rf /var/lib/apt/lists/*
+    tightvncserver \
+    openssh-server \
+    \
+    && rm -rf /var/lib/apt/lists/*
 
-# SSH jaoks vajalik kaust
-RUN mkdir -p /var/run/sshd
-
-# SSH Root login lubamine
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
-# Python-põhised tööriistad
+# ---------------------------------------------------------
+# Python tools (Jupyter)
+# ---------------------------------------------------------
 RUN pip3 install --no-cache-dir \
     numpy \
     matplotlib \
     jupyter \
     notebook
 
-# Töökeskkonna seadistus
+# ---------------------------------------------------------
+# SSH setup
+# ---------------------------------------------------------
+RUN mkdir -p /var/run/sshd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# ---------------------------------------------------------
+# Bulletproof ROS env for bash -lc (no manual "source" needed)
+# - We create /etc/profile.d/ros_env.sh
+# - We set BASH_ENV so non-interactive shells also source it
+# ---------------------------------------------------------
+ENV ROS_DISTRO=humble
+ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
+ENV BASH_ENV=/etc/profile.d/ros_env.sh
+
+RUN set -eux; \
+    printf '%s\n' \
+      '#!/usr/bin/env bash' \
+      'set +e' \
+      '' \
+      '# Source ROS setup (sets PATH, AMENT_PREFIX_PATH, etc.)' \
+      'if [ -f "/opt/ros/${ROS_DISTRO}/setup.bash" ]; then' \
+      '  source "/opt/ros/${ROS_DISTRO}/setup.bash"' \
+      'fi' \
+      '' \
+      '# Ensure Python can see ROS dist-info without manual sourcing' \
+      'PYVER="$(python3 -c '\''import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")'\'' )"' \
+      'ROSROOT="/opt/ros/${ROS_DISTRO}"' \
+      'for p in \' \
+      '  "${ROSROOT}/lib/python${PYVER}/site-packages" \' \
+      '  "${ROSROOT}/local/lib/python${PYVER}/dist-packages" \' \
+      '  "${ROSROOT}/lib/python${PYVER}/dist-packages" \' \
+      '  "${ROSROOT}/local/lib/python${PYVER}/site-packages" \' \
+      '; do' \
+      '  if [ -d "$p" ]; then' \
+      '    export PYTHONPATH="$p:${PYTHONPATH:-}"' \
+      '  fi' \
+      'done' \
+      '' \
+      'set -e' \
+      > /etc/profile.d/ros_env.sh; \
+    chmod +x /etc/profile.d/ros_env.sh; \
+    # also for interactive shells
+    echo 'source /etc/profile.d/ros_env.sh' >> /etc/bash.bashrc
+
+# ---------------------------------------------------------
+# Workspace layout
+# ---------------------------------------------------------
 WORKDIR /workspace
-RUN mkdir -p ros2_ws/src
+RUN mkdir -p /workspace/ros2_ws/src
 
-# ROS 2 keskkonna allikate lisamine
-RUN echo "source /opt/ros/humble/setup.bash" >> /etc/bash.bashrc && \
-    echo "source /workspace/ros2_ws/install/setup.bash 2>/dev/null || true" >> /etc/bash.bashrc
+# Optional overlay (if exists)
+RUN echo 'source /workspace/ros2_ws/install/setup.bash 2>/dev/null || true' >> /etc/bash.bashrc
 
-# Tudengi kasutaja loomine
+# ---------------------------------------------------------
+# Student user
+# ---------------------------------------------------------
 ARG USERNAME=student
-ENV USERNAME=$USERNAME
-RUN useradd -m "$USERNAME" && \
-    echo "$USERNAME:$USERNAME" | chpasswd && \
-    usermod -aG sudo "$USERNAME"
+ENV USERNAME=${USERNAME}
 
-# VNC parooli seadistus
+RUN useradd -m "${USERNAME}" && \
+    echo "${USERNAME}:${USERNAME}" | chpasswd && \
+    usermod -aG sudo "${USERNAME}"
+
+# ---------------------------------------------------------
+# VNC password (root)
+# ---------------------------------------------------------
 RUN mkdir -p /root/.vnc && \
-    echo -n "$USERNAME" | vncpasswd -f > /root/.vnc/passwd && \
+    echo -n "${USERNAME}" | vncpasswd -f > /root/.vnc/passwd && \
     chmod 600 /root/.vnc/passwd
 
-# Supervisord konfiguratsioonifail
+# ---------------------------------------------------------
+# Supervisord
+# ---------------------------------------------------------
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Jupyter parool ja seadistused
+# ---------------------------------------------------------
+# Jupyter config (token)
+# ---------------------------------------------------------
 RUN mkdir -p /root/.jupyter && \
-    echo "c.NotebookApp.token = '$USERNAME'" > /root/.jupyter/jupyter_notebook_config.py
+    echo "c.NotebookApp.token = '${USERNAME}'" > /root/.jupyter/jupyter_notebook_config.py
 
-# noVNC seadistamine
-RUN git clone https://github.com/novnc/noVNC.git /opt/novnc && \
-    git clone https://github.com/novnc/websockify.git /opt/novnc/utils/websockify && \
+# ---------------------------------------------------------
+# noVNC (upstream)
+# ---------------------------------------------------------
+RUN git clone --depth 1 https://github.com/novnc/noVNC.git /opt/novnc && \
+    git clone --depth 1 https://github.com/novnc/websockify.git /opt/novnc/utils/websockify && \
     chmod +x /opt/novnc/utils/novnc_proxy
 
-# X11 + VNC GUI seadistamine
+# ---------------------------------------------------------
+# X11 / Fluxbox
+# ---------------------------------------------------------
 RUN mkdir -p /root/.vnc && \
-    echo '#!/bin/sh' > /root/.vnc/xstartup && \
-    echo 'fluxbox &' >> /root/.vnc/xstartup && \
+    printf '%s\n' '#!/bin/sh' 'fluxbox &' > /root/.vnc/xstartup && \
     chmod +x /root/.vnc/xstartup
 
-# Kaust logide jaoks
+# ---------------------------------------------------------
+# Logs + ports
+# ---------------------------------------------------------
 RUN mkdir -p /var/log/supervisor
 
-# Vajalikud pordid
 EXPOSE 22 80 8888 11311 5900 6080
 
-# Käivitamine
 CMD ["/usr/bin/supervisord"]
